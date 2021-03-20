@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "./SearchBar/SearchBar";
+import UserList from "./UserList/UserList";
 import { v4 as uuid } from "uuid";
+import Layout from "./Layout/Layout";
 
 function App() {
     const [allUsers, setAllUsers] = useState([]);
@@ -10,6 +12,7 @@ function App() {
     const [ageFilter, setAgeFilter] = useState("");
     const [isMaleSelected, setMaleSelection] = useState(true);
     const [isFemaleSelected, setFemaleSelection] = useState(true);
+    //что-бы не дублировать ключ={значение} при передаче пропсов в компоненте
     const searchProps = useRef({
         setNameFilter,
         setAgeFilter,
@@ -78,22 +81,18 @@ function App() {
     }, [filteredBySex]);
 
     return (
-        <div>
+        <Layout>
             <SearchBar
                 isFemaleSelected={isFemaleSelected}
                 isMaleSelected={isMaleSelected}
                 {...searchProps.current}
             />
-            {filteredArr && (
-                <ul>
-                    {filteredArr.map((user) => (
-                        <li key={user.id}>
-                            {user.name} {user.lastname} {user.age} {user.sex}
-                        </li>
-                    ))}
-                </ul>
+            {filteredArr.length ? (
+                <UserList usersArr={filteredArr} />
+            ) : (
+                <p>Пользователи отсутствуют</p>
             )}
-        </div>
+        </Layout>
     );
 }
 
