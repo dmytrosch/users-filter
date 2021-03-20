@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import SearchBar from "./searchBar/searchBar";
+import SearchBar from "./SearchBar/SearchBar";
 import { v4 as uuid } from "uuid";
 
 function App() {
     const [allUsers, setAllUsers] = useState([]);
-    const [filtered, setFiltered] = useState([]);
+    const [filteredArr, setFilteredArr] = useState([]);
     const [nameFilter, setNameFilter] = useState("");
     const [lastnameFilter, setLastnameFilter] = useState("");
     const [ageFilter, setAgeFilter] = useState("");
-    const [isMaleSelected, setMaleSelection] = useState(false);
-    const [isFemaleSelected, setFemaleSelection] = useState(false);
-    const filterMethods = useRef({
+    const [isMaleSelected, setMaleSelection] = useState(true);
+    const [isFemaleSelected, setFemaleSelection] = useState(true);
+    const searchProps = useRef({
         setNameFilter,
         setAgeFilter,
         setLastnameFilter,
@@ -32,27 +32,61 @@ function App() {
 
     const filteredByName = useMemo(
         () =>
-            allUsers.filter((user) =>
-                user.name.toLowerCase().includes(nameFilter.toLowerCase())
-            ),
+            nameFilter
+                ? allUsers.filter((user) =>
+                      user.name.toLowerCase().includes(nameFilter.toLowerCase())
+                  )
+                : allUsers,
         [allUsers, nameFilter]
     );
     const filteredByLastname = useMemo(
         () =>
-            filteredByName.filter((user) =>
-                user.lastname
-                    .toLowerCase()
-                    .includes(lastnameFilter.toLowerCase())
-            ),
+            lastnameFilter
+                ? filteredByName.filter((user) =>
+                      user.lastname
+                          .toLowerCase()
+                          .includes(lastnameFilter.toLowerCase())
+                  )
+                : filteredByName,
         [filteredByName, lastnameFilter]
     );
+    const filteredByAge = useMemo(
+        () =>
+            ageFilter
+                ? filteredByLastname.filter(
+                      (user) => user.age === Number(ageFilter)
+                  )
+                : filteredByLastname,
+        [filteredByLastname, ageFilter]
+    );
+    const filteredBySex = useMemo(() => {
+        const arr = filteredByAge.filter((user) => {
+            const sex = user.sex;
+            if (sex === "m" && isMaleSelected) {
+                return true;
+            }
+            if (sex === "f" && isFemaleSelected) {
+                return true;
+            }
+            return false;
+        });
+        return arr;
+    }, [filteredByAge, isMaleSelected, isFemaleSelected]);
+
+    useEffect(() => {
+        setFilteredArr(filteredBySex);
+    }, [filteredBySex]);
 
     return (
         <div>
-            <SearchBar {...filterMethods.current} />
-            {allUsers && (
+            <SearchBar
+                isFemaleSelected={isFemaleSelected}
+                isMaleSelected={isMaleSelected}
+                {...searchProps.current}
+            />
+            {filteredArr && (
                 <ul>
-                    {allUsers.map((user) => (
+                    {filteredArr.map((user) => (
                         <li key={user.id}>
                             {user.name} {user.lastname} {user.age} {user.sex}
                         </li>

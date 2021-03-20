@@ -6,6 +6,8 @@ export default function SearchBar({
     setLastnameFilter,
     setFemaleSelection,
     setMaleSelection,
+    isFemaleSelected,
+    isMaleSelected,
 }) {
     return (
         <div>
@@ -29,6 +31,7 @@ export default function SearchBar({
                 <input
                     type="checkbox"
                     name="m"
+                    checked={isMaleSelected}
                     onChange={(event) => setMaleSelection(event.target.checked)}
                 />
             </label>
@@ -37,6 +40,7 @@ export default function SearchBar({
                 <input
                     type="checkbox"
                     name="f"
+                    checked={isFemaleSelected}
                     onChange={(event) =>
                         setFemaleSelection(event.target.checked)
                     }
